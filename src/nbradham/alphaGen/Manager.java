@@ -197,16 +197,24 @@ public final class Manager {
 					q.offer(new File[] { levelDir, D_DEST });
 					File[] op;
 					while (!q.isEmpty()) {
-						op = q.poll();
-						if (op[0].isDirectory()) {
+						if ((op = q.poll())[0].isDirectory()) {
 							op[1].mkdirs();
 							for (File f : op[0].listFiles())
 								q.offer(new File[] { f, new File(op[1], f.getName()) });
-						} else if (!op[1].exists()) {
+						} else if (!op[1].exists())
 							Files.move(op[0].toPath(), op[1].toPath());
-							op[0].getParentFile().delete();
-						}
 					}
+					Queue<File> delQ = new LinkedList<>();
+					for (File f : levelDir.listFiles())
+						delQ.offer(f);
+					File fi;
+					while (!delQ.isEmpty())
+						if ((fi = delQ.poll()).isDirectory() && fi.list().length != 0) {
+							for (File f : fi.listFiles())
+								delQ.offer(f);
+							delQ.offer(fi);
+						} else
+							fi.delete();
 				} catch (IOException | InterruptedException e) {
 					print(String.format("Exception occurred: %s", e));
 				}
