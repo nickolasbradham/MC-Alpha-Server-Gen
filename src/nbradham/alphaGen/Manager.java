@@ -104,7 +104,7 @@ public final class Manager {
 			if (incMax = !incMax)
 				++lineMax;
 		}
-		if (Math.abs(x += dir.dx) <= radius || Math.abs(y += dir.dy) <= radius) {
+		if (Math.abs(x += dir.dx) < radius || Math.abs(y += dir.dy) < radius) {
 			System.out.printf("Area %d out of %d requested.%n", ++count, total);
 			return new int[] { x, y };
 		}
