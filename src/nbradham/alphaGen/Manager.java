@@ -184,7 +184,7 @@ public final class Manager {
 									Files.move(op[0].toPath(), op[1].toPath(), StandardCopyOption.REPLACE_EXISTING);
 									move = false;
 								} catch (FileAlreadyExistsException e) {
-									printf("Exception occurred: %s", e);
+									printf("Exception occurred: %s%n\tWill retry.", e);
 								}
 						}
 					}
