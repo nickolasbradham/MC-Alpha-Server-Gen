@@ -72,7 +72,7 @@ public final class Manager {
 	public Manager(short chunkRadius) {
 		int t = Math.ceilDiv(chunkRadius, 10);
 		radius = t / 2;
-		total = (t = t * 2 + 1) * t;
+		total = ++t * t;
 	}
 
 	private void start() throws MalformedURLException, IOException, URISyntaxException, InterruptedException {
