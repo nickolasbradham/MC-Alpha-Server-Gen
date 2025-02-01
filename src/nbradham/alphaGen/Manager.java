@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.Channels;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -176,8 +177,16 @@ public final class Manager {
 							op[1].mkdirs();
 							for (File f : op[0].listFiles())
 								q.offer(new File[] { f, new File(op[1], f.getName()) });
-						} else if (!op[1].exists())
-							Files.move(op[0].toPath(), op[1].toPath(), StandardCopyOption.REPLACE_EXISTING);
+						} else if (!op[1].exists()) {
+							boolean move = true;
+							while (move)
+								try {
+									Files.move(op[0].toPath(), op[1].toPath(), StandardCopyOption.REPLACE_EXISTING);
+									move = false;
+								} catch (FileAlreadyExistsException e) {
+									printf("Exception occurred: %s", e);
+								}
+						}
 					}
 					Queue<File> delQ = new LinkedList<>();
 					for (File f : levelDir.listFiles())
