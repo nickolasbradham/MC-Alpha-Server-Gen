@@ -62,7 +62,7 @@ public final class Manager {
 		}
 	};
 
-	private final int radius, total;
+	private final int total;
 
 	private Dir dir = Dir.DOWN;
 	private int x = -1, y = 0, count = 0;
@@ -70,9 +70,8 @@ public final class Manager {
 	private boolean incMax = true;
 
 	public Manager(short chunkRadius) {
-		int t = Math.ceilDiv(chunkRadius, 10);
-		radius = t / 2;
-		total = ++t * t;
+		int t = Math.ceilDiv(chunkRadius, 10) / 2 * 2 + 1;
+		total = t * t;
 	}
 
 	private void start() throws MalformedURLException, IOException, URISyntaxException, InterruptedException {
@@ -104,9 +103,9 @@ public final class Manager {
 			if (incMax = !incMax)
 				++lineMax;
 		}
-		if (Math.abs(x += dir.dx) <= radius || Math.abs(y += dir.dy) <= radius) {
+		if (count < total) {
 			System.out.printf("Area %d out of %d requested.%n", ++count, total);
-			return new int[] { x, y };
+			return new int[] { x += dir.dx, y += dir.dy };
 		}
 		return null;
 	}
