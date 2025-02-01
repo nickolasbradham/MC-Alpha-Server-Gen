@@ -176,7 +176,11 @@ public final class Manager {
 							for (File f : op[0].listFiles())
 								q.offer(new File[] { f, new File(op[1], f.getName()) });
 						} else if (!op[1].exists())
-							Files.move(op[0].toPath(), op[1].toPath());
+							try {
+								Files.move(op[0].toPath(), op[1].toPath());
+							} catch (IOException e) {
+								printf("Exception occurred: %s", e);
+							}
 					}
 					Queue<File> delQ = new LinkedList<>();
 					for (File f : levelDir.listFiles())
@@ -189,7 +193,7 @@ public final class Manager {
 							delQ.offer(fi);
 						} else
 							fi.delete();
-				} catch (IOException | InterruptedException e) {
+				} catch (InterruptedException | IOException e) {
 					printf("Exception occurred: %s", e);
 				}
 			}
