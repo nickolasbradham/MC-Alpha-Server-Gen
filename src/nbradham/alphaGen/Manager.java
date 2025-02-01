@@ -72,10 +72,8 @@ public final class Manager {
 	}
 
 	private void start() throws MalformedURLException, IOException, URISyntaxException, InterruptedException {
-		System.out.println("Making work dir...");
 		D_WORK.mkdir();
 		if (!F_SERVER.exists()) {
-			System.out.println("Downloading server jar...");
 			FileOutputStream serverFos = new FileOutputStream(F_SERVER);
 			serverFos.getChannel()
 					.transferFrom(Channels.newChannel(
@@ -83,15 +81,10 @@ public final class Manager {
 							0, Long.MAX_VALUE);
 			serverFos.close();
 		}
-		System.out.printf("Checking for %s...%n", F_LEVEL_DAT);
-		if (!F_LEVEL_DAT.exists()) {
-			System.out.println("Generating level.dat...");
+		if (!F_LEVEL_DAT.exists())
 			generate(S_SERVER_FILE, D_WORK);
-		}
 		CompoundTag data = ((CompoundTag) NBTUtil.read(F_LEVEL_DAT).getTag());
-		System.out.printf("NBT: %s", data);
 		long seed = data.getCompoundTag("Data").getLong(S_SEED);
-		System.out.println("Starting worker threads...");
 		Thread[] workers = new Thread[Runtime.getRuntime().availableProcessors()];
 		for (byte i = 0; i < workers.length; ++i)
 			(workers[i] = new Thread(new Worker(i, seed))).start();
@@ -113,22 +106,17 @@ public final class Manager {
 	private void generate(String srvPath, File workDir) throws IOException, InterruptedException {
 		boolean notDone = true;
 		do {
-			System.out.printf("\tTrying server (workdir: %s)...%n", workDir);
 			Process p = new ProcessBuilder(new String[] { "java", "-jar", srvPath, "nogui" }).directory(workDir)
 					.start();
 			OutputStream os = p.getOutputStream();
 			os.write("stop".getBytes());
 			os.close();
 			Scanner scan = new Scanner(p.getErrorStream());
-			String s;
-			while (scan.hasNextLine() && notDone) {
-				System.out.printf("\tReceived: %s%n", s = scan.nextLine());
-				notDone = !s.endsWith(" [INFO] Done! For help, type \"help\" or \"?\"");
-			}
+			while (scan.hasNextLine() && notDone)
+				notDone = !scan.nextLine().endsWith(" [INFO] Done! For help, type \"help\" or \"?\"");
 			scan.close();
 			p.waitFor();
 		} while (notDone);
-		System.out.println("\tServer reported done and stopped.");
 	}
 
 	public static void main(String[] args)
@@ -157,20 +145,10 @@ public final class Manager {
 			root.put("Data", data);
 		}
 
-		private void print(String str) {
-			System.out.printf("Worker %d: %s%n", id, str);
-		}
-
-		private void printf(String fmt, Object... args) {
-			print(String.format(fmt, args));
-		}
-
 		@Override
 		public void run() {
-			print("Thread started. Making work dirs...");
 			workDir.mkdirs();
 			if (!props.exists()) {
-				print("Creating properties file...");
 				try {
 					FileOutputStream propsFos = new FileOutputStream(props);
 					propsFos.write(String.format("server-port=%d", 25565 + id).getBytes());
@@ -180,19 +158,15 @@ public final class Manager {
 					return;
 				}
 			}
-			print("Making level dir...");
 			levelDir.mkdir();
-			print("Entering main loop...");
 			int[] pos;
 			while ((pos = nextPos()) != null) {
-				printf("Generating area (%d, %d)...", pos[0], pos[1]);
+				printf("Generating area (%d, %d)...", id, pos[0], pos[1]);
 				data.putInt("SpawnX", pos[0] * I_SPAWN_GEN);
 				data.putInt("SpawnZ", pos[1] * I_SPAWN_GEN);
-				printf("Writing NBT: %s", root);
 				try {
 					NBTUtil.write(nbt, levelDat);
 					generate(F_SERVER.getAbsolutePath(), workDir);
-					print("Moving new files...");
 					Queue<File[]> q = new LinkedList<>();
 					q.offer(new File[] { levelDir, D_DEST });
 					File[] op;
@@ -216,10 +190,14 @@ public final class Manager {
 						} else
 							fi.delete();
 				} catch (IOException | InterruptedException e) {
-					print(String.format("Exception occurred: %s", e));
+					printf("Exception occurred: %s", e);
 				}
 			}
-			print("Done.");
+			printf("Done.");
+		}
+
+		private void printf(String format, Object... args) {
+			System.out.printf("Thread %d: %s%n", id, String.format(format, args));
 		}
 	}
 }
