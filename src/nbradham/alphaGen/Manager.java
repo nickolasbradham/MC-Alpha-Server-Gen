@@ -67,7 +67,7 @@ public final class Manager {
 	private byte lineN = 0, lineMax = 0;
 	private boolean incMax = true;
 
-	public Manager(byte chunkRadius) {
+	public Manager(short chunkRadius) {
 		radius = chunkRadius / 20;
 	}
 
@@ -122,7 +122,7 @@ public final class Manager {
 	public static void main(String[] args)
 			throws MalformedURLException, IOException, URISyntaxException, InterruptedException {
 		try {
-			new Manager(Byte.parseByte(args[0])).start();
+			new Manager(Short.parseShort(args[0])).start();
 		} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
 			System.err.println("Arguments: <chunkRadius>");
 		}
