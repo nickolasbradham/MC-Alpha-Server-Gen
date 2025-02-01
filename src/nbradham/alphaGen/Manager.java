@@ -68,7 +68,7 @@ public final class Manager {
 	private boolean incMax = true;
 
 	public Manager(byte chunkRadius) {
-		radius = (chunkRadius - 1) / 14;
+		radius = chunkRadius / 20;
 	}
 
 	private void start() throws MalformedURLException, IOException, URISyntaxException, InterruptedException {
@@ -123,7 +123,7 @@ public final class Manager {
 			String s;
 			while (scan.hasNextLine() && notDone) {
 				System.out.printf("\tReceived: %s%n", s = scan.nextLine());
-				notDone = !s.contains(" [INFO] Done! For help, type \"help\" or \"?\"");
+				notDone = !s.endsWith(" [INFO] Done! For help, type \"help\" or \"?\"");
 			}
 			scan.close();
 			p.waitFor();
@@ -142,7 +142,7 @@ public final class Manager {
 
 	private final class Worker implements Runnable {
 		private static final File D_WORKERS = new File(D_WORK, "workers"), D_DEST = new File(D_WORK, S_WORLD);
-		private static final short I_SPAWN_GEN = 224;
+		private static final short I_SPAWN_GEN = 320;
 
 		private final File workDir, props, levelDir, levelDat;
 		private final byte id;
