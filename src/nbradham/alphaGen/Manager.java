@@ -62,7 +62,7 @@ public final class Manager {
 		}
 	};
 
-	private final int total;
+	private final int radius, total;
 
 	private Dir dir = Dir.DOWN;
 	private int x = -1, y = 0, count = 0;
@@ -70,7 +70,7 @@ public final class Manager {
 	private boolean incMax = true;
 
 	public Manager(short chunkRadius) {
-		int t = Math.ceilDiv(chunkRadius, 10) + 1;
+		int t = (radius = Math.ceilDiv(chunkRadius, 10) / 2) * 2 + 1;
 		total = t * t;
 	}
 
@@ -103,9 +103,9 @@ public final class Manager {
 			if (incMax = !incMax)
 				++lineMax;
 		}
-		if (++count <= total) {
-			System.out.printf("Area %d out of %d requested.%n", count, total);
-			return new int[] { x += dir.dx, y += dir.dy };
+		if (Math.abs(x += dir.dx) > radius || Math.abs(y += dir.dy) > radius) {
+			System.out.printf("Area %d out of %d requested.%n", ++count, total);
+			return new int[] { x, y };
 		}
 		return null;
 	}
